@@ -64,8 +64,9 @@
     </v-slide-group>
     <v-item-group mandatory>
       <v-item v-for="(recentData, index) in recentDatas" :key="index">
-        <v-btn icon @click="slide = index">
-          <v-icon width="5px" height="5px">mdi-record</v-icon>
+        <v-btn height="15px" width="15px" icon @click="slide = index">
+          <ellipse-icon />
+          <!-- <v-icon width="5px" height="5px">mdi-record</v-icon> -->
         </v-btn>
       </v-item>
     </v-item-group>
@@ -75,11 +76,13 @@
 <script>
 import favoriteIcon from "./FavoriteIcon.vue";
 import visibilityIcon from "./VisibilityIcon.vue";
+import ellipseIcon from "./EllipseIcon.vue";
 export default {
   name: "RecentContent",
   components: {
     favoriteIcon,
     visibilityIcon,
+    ellipseIcon,
   },
   methods: {
     toggle() {},
