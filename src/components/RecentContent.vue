@@ -4,7 +4,7 @@
       <h2 class="pl-5 mt-3 color">Recent Content Lists</h2>
     </v-row>
 
-    <v-slide-group v-model="model" active-class="success">
+    <v-slide-group v-model="slide" center-active>
       <v-slide-item v-for="recentData in recentDatas" :key="recentData.id">
         <v-card outlined class="ma-2" max-width="290">
           <v-img
@@ -27,7 +27,6 @@
               </v-col>
             </v-row>
           </v-img>
-
           <v-card-actions>
             <v-row>
               <v-col sm="2"></v-col>
@@ -64,13 +63,9 @@
       </v-slide-item>
     </v-slide-group>
     <v-item-group mandatory>
-      <v-item
-        v-for="recentData in recentDatas"
-        :key="recentData.id"
-        v-slot="{ active, toggle }"
-      >
-        <v-btn :input-value="active" icon @click="toggle">
-          <v-icon>mdi-record</v-icon>
+      <v-item v-for="(recentData, index) in recentDatas" :key="index">
+        <v-btn icon @click="slide = index">
+          <v-icon width="5px" height="5px">mdi-record</v-icon>
         </v-btn>
       </v-item>
     </v-item-group>
@@ -86,11 +81,14 @@ export default {
     favoriteIcon,
     visibilityIcon,
   },
-  methods: {},
+  methods: {
+    toggle() {},
+  },
   data: () => ({
     model: null,
     recentDatas: [],
     length: 8,
+    slide: null,
   }),
 
   mounted() {
@@ -136,4 +134,8 @@ export default {
 .btn-margin {
   margin-top: -139px;
 }
+/* .icon-record {
+  width: 5px;
+  height: 5px;
+} */
 </style>
