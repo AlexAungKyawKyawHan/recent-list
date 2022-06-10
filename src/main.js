@@ -3,6 +3,10 @@ import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
 import moment from "moment";
+import InfiniteScroll from 'v-infinite-scroll'
+
+
+Vue.use(InfiniteScroll)
 
 Vue.config.productionTip = false
 Vue.filter('formatDate', function (value) {

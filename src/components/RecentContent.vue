@@ -4,8 +4,12 @@
       <h2 class="pl-5 mt-3 color">Recent Content Lists</h2>
     </v-row>
 
-    <v-slide-group v-model="slide" center-active>
-      <v-slide-item v-for="recentData in recentDatas" :key="recentData.id">
+    <v-infinite-scroll
+      class="item"
+      :offset="20"
+      style="max-height: 80vh; overflow-x: auto; display: flex"
+    >
+      <div v-for="recentData in recentDatas" :key="recentData.id">
         <v-card outlined class="ma-2" max-width="290">
           <v-img
             v-if="recentData.headerImage != null"
@@ -60,39 +64,27 @@
             </v-row>
           </v-card-actions>
         </v-card>
-      </v-slide-item>
-    </v-slide-group>
-    <v-item-group mandatory>
-      <v-item v-for="(recentData, index) in recentDatas" :key="index">
-        <v-btn height="15px" width="15px" icon @click="slide = index">
-          <ellipse-icon />
-          <!-- <v-icon width="5px" height="5px">mdi-record</v-icon> -->
-        </v-btn>
-      </v-item>
-    </v-item-group>
+      </div>
+    </v-infinite-scroll>
   </v-container>
 </template>
 
 <script>
 import favoriteIcon from "./FavoriteIcon.vue";
 import visibilityIcon from "./VisibilityIcon.vue";
-import ellipseIcon from "./EllipseIcon.vue";
 export default {
   name: "RecentContent",
   components: {
     favoriteIcon,
     visibilityIcon,
-    ellipseIcon,
-  },
-  methods: {
-    toggle() {},
+    // ellipseIcon,
   },
   data: () => ({
     model: null,
     recentDatas: [],
     length: 8,
-    slide: null,
   }),
+  methods: {},
 
   mounted() {
     fetch("https://api.channeldk.com/v1/content?page=1&size=10")
@@ -137,8 +129,4 @@ export default {
 .btn-margin {
   margin-top: -139px;
 }
-/* .icon-record {
-  width: 5px;
-  height: 5px;
-} */
 </style>
