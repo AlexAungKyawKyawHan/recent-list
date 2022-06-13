@@ -7,10 +7,20 @@
     <v-infinite-scroll
       class="item"
       :offset="20"
-      style="max-height: 80vh; overflow-x: auto; display: flex"
+      style="max-height: 80vh; overflow-x: scroll; display: flex"
     >
-      <div v-for="recentData in recentDatas" :key="recentData.id">
-        <v-card outlined class="ma-2" max-width="290">
+      <v-spacer
+        v-model="slide"
+        v-for="recentData in recentDatas"
+        :key="recentData.id"
+        id="scroll-target"
+      >
+        <v-card
+          v-scroll:#scroll-target="onScroll"
+          outlined
+          class="ma-2"
+          max-width="290"
+        >
           <v-img
             v-if="recentData.headerImage != null"
             class="white--text align-end"
@@ -46,7 +56,6 @@
               <v-col sm="4">
                 <div class="grid">
                   <favorite-icon color="red" />
-
                   <span>{{ recentData.__v }}</span>
                 </div>
               </v-col>
@@ -64,27 +73,46 @@
             </v-row>
           </v-card-actions>
         </v-card>
-      </div>
+      </v-spacer>
     </v-infinite-scroll>
+    {{ offsetTop }}
+    <v-item-group mandatory>
+      <v-item v-for="(recentData, index) in recentDatas" :key="index">
+        <v-btn @click="slide = index" height="15px" width="15px" icon>
+          <ellipse-icon />
+        </v-btn>
+      </v-item>
+    </v-item-group>
   </v-container>
 </template>
 
 <script>
 import favoriteIcon from "./FavoriteIcon.vue";
 import visibilityIcon from "./VisibilityIcon.vue";
+import ellipseIcon from "./EllipseIcon.vue";
+
 export default {
   name: "RecentContent",
   components: {
     favoriteIcon,
     visibilityIcon,
-    // ellipseIcon,
+    ellipseIcon,
   },
+
   data: () => ({
     model: null,
     recentDatas: [],
     length: 8,
+    slide: null,
+    offsetTop: 0,
+    // currentSection: "",
   }),
-  methods: {},
+  methods: {
+    onScroll(e) {
+      this.offsetTop = e.target.scrollTop;
+      console.log(this.offsetTop, "this is scroll");
+    },
+  },
 
   mounted() {
     fetch("https://api.channeldk.com/v1/content?page=1&size=10")
@@ -92,6 +120,17 @@ export default {
       .then((json) => {
         this.recentDatas = json.data;
       });
+
+    // const observer = new IntersectionObserver((entries) => {
+    //   entries.forEach((entry) => {
+    //     if (entry.intersectionRatio > 0) {
+    //       this.currentSection = entry.target.getAttribute("id");
+    //     }
+    //   });
+    //   document.querySelectorAll("v-card").forEach((section) => {
+    //     observer.observe(section);
+    //   });
+    // });
   },
 };
 </script>
@@ -129,4 +168,15 @@ export default {
 .btn-margin {
   margin-top: -139px;
 }
+.item::-webkit-scrollbar {
+  display: none;
+}
+.item {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+v-btn.active {
+  background-color: #03b1fc;
+}
 </style>
+// :class="{ active: (index = currentSection) }"
