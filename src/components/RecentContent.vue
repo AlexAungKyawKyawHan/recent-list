@@ -4,7 +4,8 @@
       <h2 class="pl-5 mt-3 color">Recent Content Lists</h2>
     </v-row>
 
-    <v-infinite-scroll
+    <div
+      @scroll.passive="onScroll"
       class="item"
       :offset="20"
       style="max-height: 80vh; overflow-x: scroll; display: flex"
@@ -19,7 +20,7 @@
           v-scroll:#scroll-target="onScroll"
           outlined
           class="ma-2"
-          max-width="290"
+          max-width="300"
         >
           <v-img
             v-if="recentData.headerImage != null"
@@ -74,13 +75,15 @@
           </v-card-actions>
         </v-card>
       </v-spacer>
-    </v-infinite-scroll>
-    {{ offsetTop }}
-    <v-item-group mandatory>
-      <v-item v-for="(recentData, index) in recentDatas" :key="index">
-        <v-btn @click="slide = index" height="15px" width="15px" icon>
-          <ellipse-icon />
-        </v-btn>
+    </div>
+    <v-item-group v-show="this.loading === true" mandatory>
+      <v-item v-for="i in 7" :key="i">
+        <v-icon x-small class="check" v-if="checkScrollRange(i) == true">
+          mdi-checkbox-blank-circle
+        </v-icon>
+        <v-icon x-small class="check" v-else-if="checkScrollRange(i) == false">
+          mdi-checkbox-blank-circle-outline
+        </v-icon>
       </v-item>
     </v-item-group>
   </v-container>
@@ -89,14 +92,12 @@
 <script>
 import favoriteIcon from "./FavoriteIcon.vue";
 import visibilityIcon from "./VisibilityIcon.vue";
-import ellipseIcon from "./EllipseIcon.vue";
 
 export default {
   name: "RecentContent",
   components: {
     favoriteIcon,
     visibilityIcon,
-    ellipseIcon,
   },
 
   data: () => ({
@@ -105,32 +106,42 @@ export default {
     length: 8,
     slide: null,
     offsetTop: 0,
-    // currentSection: "",
+    scrollX: 0,
+    totalPixel: 0,
+    eachScrollPixel: 0,
+    loading: false,
   }),
   methods: {
     onScroll(e) {
-      this.offsetTop = e.target.scrollTop;
-      console.log(this.offsetTop, "this is scroll");
+      this.scrollX = e.target.scrollLeft;
+    },
+    checkScrollRange(i) {
+      if (
+        i == 1 &&
+        0 <= this.scrollX &&
+        i * this.eachScrollPixel >= this.scrollX
+      ) {
+        return true;
+      }
+      if (
+        i > 1 &&
+        (i - 1) * this.eachScrollPixel <= this.scrollX &&
+        i * this.eachScrollPixel >= this.scrollX
+      ) {
+        return true;
+      }
+      return false;
     },
   },
-
   mounted() {
     fetch("https://api.channeldk.com/v1/content?page=1&size=10")
       .then((res) => res.json())
       .then((json) => {
         this.recentDatas = json.data;
+        this.totalPixel = json.data.length * 300;
+        this.eachScrollPixel = this.totalPixel / 8;
+        this.loading = true;
       });
-
-    // const observer = new IntersectionObserver((entries) => {
-    //   entries.forEach((entry) => {
-    //     if (entry.intersectionRatio > 0) {
-    //       this.currentSection = entry.target.getAttribute("id");
-    //     }
-    //   });
-    //   document.querySelectorAll("v-card").forEach((section) => {
-    //     observer.observe(section);
-    //   });
-    // });
   },
 };
 </script>
@@ -172,11 +183,12 @@ export default {
   display: none;
 }
 .item {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+
 v-btn.active {
   background-color: #03b1fc;
 }
 </style>
-// :class="{ active: (index = currentSection) }"
+
